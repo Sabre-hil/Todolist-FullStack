@@ -53,14 +53,6 @@ app.post('/registration', async (req, res) => {
   } catch (error) {
     res.status(500).json({message: 'Такой пользователь уже существует!'})
   }
-  const {name, email, number, password} = req.body;
-  const hashPass = await bcrypt.hash(password, 10);
-  const user = await User.findOne({where: { email }})
-  if (!user) {
-    const newUser = await User.create({name, email, number, password: hashPass});
-    req.session.user = {id: newUser.id, name: newUser.name};
-    return res.json(req.session.user);
-  } res.status(500).json({message: 'Такой пользователь уже существует!'})
 });
 
 app.post('/login', async (req, res) => {
