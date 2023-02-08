@@ -1,8 +1,8 @@
-import React, { FormEvent, ChangeEvent, useState } from 'react';  
+import React, { FormEvent, ChangeEvent, useState, useEffect } from 'react';  
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getAuthThunk } from '../../redux/Thunks/authThunks/getAuthThunk';
-import { AppDispatch } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 
 interface state {
   email: string,
@@ -12,6 +12,7 @@ interface state {
 const Login: React.FC = () => {
   const [inputsState, setInputState] = useState<state>({email: '', password: ''});
   const dispatch = useDispatch<AppDispatch>();
+  const {error, status} = useSelector((state: RootState ) => state.auth);
   const navigate = useNavigate();
   const changeHandler = (e: ChangeEvent) => {
     setInputState((prev) => ({
@@ -20,13 +21,19 @@ const Login: React.FC = () => {
     }))
   }
 
+  useEffect(() => {
+    if (status === 'success') {
+      navigate('/');
+    };
+    if (status === 'error') {
+      alert('Ошибка авторизации');
+    };
+  }, [error, status])
+
+
   const submitHandler = async (e: FormEvent) => {
     e.preventDefault();
-    try {
-      await dispatch(getAuthThunk(inputsState)).then(() => navigate('/'))
-    } catch (error) {
-      alert('Произошла ошибка')
-    }
+    await dispatch(getAuthThunk(inputsState));
   };
 
   return (
