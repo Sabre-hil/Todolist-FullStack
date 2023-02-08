@@ -1,13 +1,15 @@
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { RootState, AppDispatch } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 import { regThunk } from '../../redux/Thunks/authThunks/getRegThunk';
 
 
 const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const {status} = useSelector((state: RootState) => state.auth);
+ 
 
 
   const [inputState, setInputState] = useState(
@@ -22,15 +24,22 @@ const SignIn: React.FC = () => {
       setInputState((prev) => ({
         ...prev,
         [(e.target as HTMLInputElement).name]: (e.target as HTMLInputElement).value
-      }))
+      }));
     };
 
+    useEffect(() => {
+      if (status === 'success') {
+        navigate('/')
+      }
+      if (status === 'error') {
+        alert('Такой пользователь уже существует')
+      }
+    }, [status]) 
+
     const submitHandler = async (e: FormEvent) => {
-      e.preventDefault()
-      dispatch(regThunk(inputState)).then(() => {
-        navigate('/');
-      })
-    }
+      e.preventDefault();
+      dispatch(regThunk(inputState))
+    };
 
   return (
     <section className="vh-100" id="reg-block">
