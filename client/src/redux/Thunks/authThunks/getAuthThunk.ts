@@ -18,12 +18,17 @@ export const getAuthThunk = createAsyncThunk(
         credentials: 'include',
         body: JSON.stringify(data)
       });
-      if (responce.ok) {
+      try {
         const { id, name }: authType = await responce.json();
-        const res = { id, name }
+        const res = { id, name };
+        if (!responce.ok) {
+          throw new Error("Server Error!");
+          
+        }
         return res;
-      } else {
-        alert('Произошла ошибка');
+
+      } catch (error: any) {
+        return rejectWithValue(error.message)
       }
   }
 );
